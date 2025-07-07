@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo Installing Trivy and Checkov...
+      - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+      - pip install checkov
+
+  pre_build:
+    commands:
+      - echo Running Trivy scan...
+      - ./trivy fs . --exit-code 1 --severity CRITICAL,HIGH || exit 1
+      - echo Running Checkov scan...
+      - checkov -d . || exit 1
+
+  build:
+    commands:
+      - echo "Build passed. You can add build steps here."
